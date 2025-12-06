@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,6 +13,8 @@
 #include "server_utils.h"
 
 // TCP helpers
+
+/*--------Server Start--------*/
 int tcp_listen(const char* ip, const char* port) 
 {
     struct addrinfo hints, *res=NULL, *rp=NULL;
@@ -51,8 +52,6 @@ int tcp_listen(const char* ip, const char* port)
     return fd;
 }
 
-// Robust line I/O
-
 int tcp_send_line(int fd, const char* line) 
 {
     size_t len = strlen(line);
@@ -86,3 +85,8 @@ int tcp_recv_line(int fd, char* buf, size_t buflen)
     buf[pos] = '\0';
     return (int)pos;
 }
+/*--------Server End--------*/
+
+
+/*--------Client Start--------*/
+/*--------Client End--------*/
