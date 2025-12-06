@@ -11,6 +11,7 @@
 
 #include "common.h"
 #include "server_utils.h"
+#include "client_utils.h"
 
 // TCP helpers
 
@@ -89,4 +90,52 @@ int tcp_recv_line(int fd, char* buf, size_t buflen)
 
 
 /*--------Client Start--------*/
+// BIO adapters
+static int tcp_recv(int fd, unsigned char *buf, size_t len) {
+    ssize_t r = recv(fd, buf, len, 0);
+    if (r < 0) {
+        return -1;
+    }
+    if (r == 0){
+        return 0;
+    }
+    return r;
+}
+
+// TCP helpers
+static int tcp_connect(const char* host, const char* port) {
+    struct addrinfo hints, *res=NULL, *rp=NULL;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    int err = getaddrinfo(host, port, &hints, &res);
+    if (err) { fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(err)); return -1; }
+    int fd = -1;
+    for (rp = res; rp; rp = rp->ai_next) {
+        fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if (fd == -1) continue;
+        if (connect(fd, rp->ai_addr, rp->ai_addrlen) == 0) break;
+        close(fd); fd = -1;
+    }
+    freeaddrinfo(res);
+    return fd;
+}
+
+static int tcp_listen(const char* ip, const char* port) {
+    struct addrinfo hints, *res=NULL, *rp=NULL;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+    int err = getaddrinfo(ip, port, &hints, &res);
+    if (err) { fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(err)); return -1; }
+    int fd = -1;
+    for (rp = res; rp; rp = rp->ai_next) {
+        fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if (fd == -1) continue;
+        int opt=1; setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+        if (bind(fd, rp->ai_addr, rp->ai_addrlen)==0 && listen(fd, 5)==0) break;
+        close(fd); fd=-1;
+    }
+    freeaddrinfo(res);
 /*--------Client End--------*/
