@@ -11,7 +11,7 @@
 #include <arpa/inet.h>
 
 #include "common.h"
-#include "server_utils.h"
+#include "tcp_utils.h"
 #include "proto.h"
 
 int main(int argc, char** argv) {
@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Client connected\n");
 
         char line[MAX_LINE];
-        int n = tcp_recv_line(cfd, line, sizeof line);
+        int n = recv_line(cfd, line, sizeof line);
         if (n <= 0) 
 	{ 
 	   fprintf(stderr, "recv failed (%d)\n", n); 
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
         // TODO: Replace with PT->ET conversion in your final solution.
         char resp[MAX_LINE];
         proto_handle_server_request(line, resp, sizeof resp);
-        if (tcp_send_line(cfd, resp) < 0) 
+        if (send_line(cfd, resp) < 0) 
 	{ 
 	   fprintf(stderr, "send failed\n"); 
 	}
