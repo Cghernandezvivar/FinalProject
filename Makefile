@@ -1,9 +1,9 @@
 
 CC=gcc
 CFLAGS=-Wall -Wextra -O2 -g $(shell pkg-config --cflags mbedtls)
-LDLIBS=$(shell pkg-config --libs mbedcrypto mbedx509 mbedtls)
+LDLIBS=$(shell pkg-config --libs mbedcrypto)
 
-OBJS=tls_utils.o proto.o
+OBJS=tcp_utils.o proto.o
 
 all: server client
 

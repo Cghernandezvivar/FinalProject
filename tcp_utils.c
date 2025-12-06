@@ -169,7 +169,6 @@ int recv_line(int fd, char* buf, size_t buflen) {
 
 int client_connect(const char* host, const char* port, int *out_fd) {
     int fd = tcp_connect(host, port);
-    int ret = 0;
     if (fd < 0){
 	perror("tcp_connect"); 
 	return -1; 
